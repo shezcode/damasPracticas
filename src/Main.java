@@ -13,5 +13,7 @@ public class Main {
         int[] posInicial = {Integer.parseInt(inputX), Integer.parseInt(inputY)};
         int[][] posValidas = tablero.devolverMovimientos(posInicial);
         System.out.println(Arrays.deepToString(posValidas));
+        tablero.hacerMovimiento(posInicial, new int[]{4, 1}, posValidas);
+        tablero.printTablero();
     }
 }

@@ -23,15 +23,25 @@ public class Main {
 
         if (tablero.getTurno() % 2 == 0){
             System.out.println("TURNO BLANCAS");
+            tablero.setLetraJugador('B');
         } else {
             System.out.println("TURNO NEGRAS");
+            tablero.setLetraJugador('N');
         }
 
-        System.out.print("Introduce la pieza a mover (Eje Y): ");
-        String inputX = scanner.nextLine();
-        System.out.print("Introduce la pieza a mover (Eje X): ");
-        String inputY = scanner.nextLine();
-        int[] posInicial = {Integer.parseInt(inputX), Integer.parseInt(inputY)};
+        int[] posInicial;
+        do {
+            System.out.print("Introduce la pieza a mover (Eje Y): ");
+            String inputX = scanner.nextLine();
+            System.out.print("Introduce la pieza a mover (Eje X): ");
+            String inputY = scanner.nextLine();
+            posInicial = new int[] {Integer.parseInt(inputX), Integer.parseInt(inputY)};
+            if (tablero.getTablero()[posInicial[0]][posInicial[1]] != tablero.getLetraJugador()){
+                System.out.println("Input incorrecto, esa pieza no te corresponde! :(");
+                System.out.println("-------------------------------------------------");
+            }
+        } while (tablero.getTablero()[posInicial[0]][posInicial[1]] != tablero.getLetraJugador());
+
         int[][] posValidas = tablero.devolverMovimientos(posInicial);
         if (posValidas.length == 0){
             tablero.setGameOver();

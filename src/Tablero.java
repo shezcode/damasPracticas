@@ -17,6 +17,7 @@ public class Tablero {
    };
 
    public int turno = 0;
+   public char letraJugador;
 
    private boolean gameOver = false;
 
@@ -93,6 +94,8 @@ public class Tablero {
 
             if (tablero[posicionInicial[0] + 1][posicionInicial[1] - 1] == 'B' && tablero[posicionInicial[0] + 2][posicionInicial[1] - 2] == 'L'){
                // si se llega aqui hay que eliminar la pieza Blanca y registrar el movimiento de la pieza Negra
+               // AQUI FALTA PASAR LOS PARAMETROS CORRECTOS AL METODO Y COMPROBAR QUE FUNCIONE
+               //comerPieza();
             }
          }
 
@@ -155,10 +158,20 @@ public class Tablero {
       }
 
 
+   }
+
+   public void comerPieza(int[] posicionInicial, int[] posicionFinal, int[][] movimientosPosibles){
       // COMER PIEZA
 
       // si hay una diferencia de dos filas y dos columnas, entonces ha pasado por encima
       // de una pieza
+
+      int filaInicial = posicionInicial[0];
+      int columnaInicial = posicionInicial[1];
+
+      int filaFinal = posicionFinal[0];
+      int columnaFinal = posicionFinal[1];
+
       if (columnaFinal - columnaInicial > 1) {
 
          int filaVictima = 0;
@@ -242,4 +255,13 @@ public class Tablero {
    public void setGameOver() {
       this.gameOver = !this.gameOver;
    }
+
+   public char getLetraJugador() {
+      return letraJugador;
+   }
+
+   public void setLetraJugador(char letraJugador) {
+      this.letraJugador = letraJugador;
+   }
+
 }

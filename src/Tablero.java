@@ -16,6 +16,10 @@ public class Tablero {
            {7, 0}, {7, 2}, {7, 4}, {7, 6},
    };
 
+   public int turno = 0;
+
+   private boolean gameOver = false;
+
    public Tablero(){
       insertarL();
       insertPiezas();
@@ -57,20 +61,21 @@ public class Tablero {
       if (tablero[posicionInicial[0]][posicionInicial[1]] == 'B'){
          int i = posicionInicial[0] - 1;
          int j = posicionInicial[1] - 1;
-         if (i < 0){
-            i = 0;
+
+         if (i >= 0 && j >= 0){
+
+            if (tablero[i][j] == 'L'){
+               int[] posicionValida = {i, j};
+               result.add(posicionValida);
+            }
+
          }
-         if (j < 0){
-            j = 0;
-         }
-         if (tablero[i][j] == 'L'){
-            int[] posicionValida = {i, j};
-            result.add(posicionValida);
-         }
+
          if (tablero[i][posicionInicial[1] + 1] == 'L'){
             int[] posicionValida = {i, posicionInicial[1] + 1};
             result.add(posicionValida);
          }
+
       }
 
       //comprobar si posicion inicial es de Negras
@@ -78,26 +83,26 @@ public class Tablero {
          int i = posicionInicial[0] + 1;
          int j = posicionInicial[1] - 1;
 
-         if (i < DIMENSION){
-            i = 7;
+         //evitamos borde tablero
+         if (i < DIMENSION && j >= 0){
+
+            if (tablero[i][j] == 'L'){
+               int[] posicionValida = {i, j};
+               result.add(posicionValida);
+            }
+
+            if (tablero[posicionInicial[0] + 1][posicionInicial[1] - 1] == 'B' && tablero[posicionInicial[0] + 2][posicionInicial[1] - 2] == 'L'){
+               // si se llega aqui hay que eliminar la pieza Blanca y registrar el movimiento de la pieza Negra
+            }
          }
 
-         if (j < 0){
-            j = 0;
-         }
+         if (j + 2 < DIMENSION){
 
-         if (tablero[i][j] == 'L'){
-            int[] posicionValida = {i, j};
-            result.add(posicionValida);
-         }
+            if (tablero[i][posicionInicial[1] + 1] == 'L'){
+               int[] posicionValida = {i, posicionInicial[1] + 1};
+               result.add(posicionValida);
+            }
 
-         if (tablero[i][posicionInicial[1] + 1] == 'L'){
-            int[] posicionValida = {i, posicionInicial[1] + 1};
-            result.add(posicionValida);
-         }
-
-         if (tablero[posicionInicial[0] + 1][posicionInicial[1] - 1] == 'B' && tablero[posicionInicial[0] + 2][posicionInicial[1] - 2] == 'L'){
-            // si se llega aqui hay que eliminar la pieza Blanca y registrar el movimiento de la pieza Negra
          }
       }
 
@@ -110,11 +115,15 @@ public class Tablero {
       return resultArray;
    }
 
+
    public void hacerMovimiento(int[] posicionInicial, int[] posicionFinal, int[][] movimientosPosibles) {
       boolean estaDentro = false;
       for (int[] movimiento : movimientosPosibles) {
-         if (movimiento==posicionFinal) {
+         int columnaMovimiento = movimiento[1];
+         int filaMovimiento = movimiento[0];
+         if (columnaMovimiento==posicionFinal[1] && filaMovimiento==posicionFinal[0]) {
             estaDentro = true;
+            break;
          }
       }
 
@@ -133,17 +142,18 @@ public class Tablero {
       tablero[filaInicial][columnaInicial] = 'L';
       tablero[filaFinal][columnaFinal] = fichaAMover;
 
-      for (int[] posiciones : posNegras) {
-         if (posiciones == posicionInicial) {
-            posiciones = posicionFinal;
+      for(int i = 0; i < posNegras.length; i++){
+         if (Arrays.equals(posNegras[i], posicionInicial)){
+            posNegras[i] = posicionFinal;
          }
       }
 
-      for (int[] posiciones : posBlancas) {
-         if (posiciones == posicionInicial) {
-            posiciones = posicionFinal;
+      for(int i = 0; i < posBlancas.length; i++){
+         if (Arrays.equals(posBlancas[i], posicionInicial)){
+            posBlancas[i] = posicionFinal;
          }
       }
+
 
       // COMER PIEZA
 
@@ -170,7 +180,7 @@ public class Tablero {
          }
 
          // si ha ido hacia la izq, la columna disminuye
-         if (columnaInicial > columnaFinal) {
+         else if (columnaInicial > columnaFinal) {
             columnaVictima = columnaInicial -1;
          }
 
@@ -179,19 +189,20 @@ public class Tablero {
          // eliminar del tablero y de las posiciones la victima
 
          tablero[filaVictima][columnaVictima] = 'L';
-         for (int[] posiciones : posBlancas) {
-            if (posiciones == posicionVictima) {
-               posiciones = new int[] {9, 9};
+
+         for(int i = 0; i < posBlancas.length; i++){
+            if (Arrays.equals(posBlancas[i], posicionVictima)){
+               posBlancas[i] = new int[] {9, 9};
             }
          }
-         for (int[] posiciones : posNegras) {
-            if (posiciones == posicionVictima) {
-               posiciones = new int[] {9, 9};
+
+         for(int i = 0; i < posNegras.length; i++){
+            if (Arrays.equals(posNegras[i], posicionVictima)){
+               posNegras[i] = new int[] {9, 9};
             }
          }
       }
    }
-
    public char[][] getTablero() {
       return tablero;
    }
@@ -214,5 +225,21 @@ public class Tablero {
 
    public void setPosBlancas(int[][] posBlancas) {
       this.posBlancas = posBlancas;
+   }
+
+   public int getTurno() {
+      return turno;
+   }
+
+   public void increaseTurno() {
+      this.turno++;
+   }
+
+   public boolean isGameOver() {
+      return gameOver;
+   }
+
+   public void setGameOver() {
+      this.gameOver = !this.gameOver;
    }
 }

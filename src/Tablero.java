@@ -1,25 +1,28 @@
+import com.diogonunes.jcolor.Attribute;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static com.diogonunes.jcolor.Ansi.colorize;
 
 public class Tablero {
    private final int DIMENSION= 8;
    public char[][] tablero = new char[DIMENSION][DIMENSION];
- //  public int[][] posNegras = {
- //          {0, 1}, {0, 3}, {0, 5}, {0, 7},
- //          {1, 0}, {1, 2}, {1, 4}, {1, 6},
- //          {2, 1}, {2, 3}, {2, 5}, {2, 7}
- //  };
+   public int[][] posNegras = {
+           {0, 1}, {0, 3}, {0, 5}, {0, 7},
+           {1, 0}, {1, 2}, {1, 4}, {1, 6},
+           {2, 1}, {2, 3}, {2, 5}, {2, 7}
+   };
 
- //  public int[][] posBlancas = {
- //          {5, 0}, {5, 2}, {5, 4}, {5, 6},
- //          {6, 1}, {6, 3}, {6, 5}, {6, 7},
- //          {7, 0}, {7, 2}, {7, 4}, {7, 6},
- //  };
-
-   public int[][] posNegras = {{4,4}};
-   public int[][] posBlancas= {{5,5}};
+   public int[][] posBlancas = {
+           {5, 0}, {5, 2}, {5, 4}, {5, 6},
+           {6, 1}, {6, 3}, {6, 5}, {6, 7},
+           {7, 0}, {7, 2}, {7, 4}, {7, 6},
+   };
 
    public int turno = 0;
+
+   public int turnosSinComer = 0;
    public char letraJugador;
 
    private boolean gameOver = false;
@@ -52,9 +55,28 @@ public class Tablero {
    }
 
    void pintarTablero() {
+
+      System.out.print("     ");
+
+      for (int i = 0; i < DIMENSION; i++){
+         System.out.print(colorize(Integer.toString(i), Attribute.BRIGHT_YELLOW_TEXT()));
+         System.out.print("    ");
+      }
+
+      System.out.println();
+      System.out.println();
+
       for (int i = 0; i<DIMENSION; i++) {
+         System.out.print(colorize(Integer.toString(i), Attribute.BRIGHT_YELLOW_TEXT()));
+         System.out.print("    ");
          for (int j=0; j< DIMENSION; j++) {
-            System.out.print(tablero[i][j]);
+            if (tablero[i][j] == 'B'){
+               System.out.print(colorize("B", Attribute.BRIGHT_CYAN_TEXT()));
+            } else if (tablero[i][j] == 'N'){
+               System.out.print(colorize("N", Attribute.BRIGHT_MAGENTA_TEXT()));
+            } else {
+               System.out.print(tablero[i][j]);
+            }
             System.out.print("    ");
          }
          System.out.println("");
@@ -127,6 +149,7 @@ public class Tablero {
 
 
    public void hacerMovimiento(int[] posicionInicial, int[] posicionFinal, int[][] movimientosPosibles) {
+
       boolean estaDentro = false;
       for (int[] movimiento : movimientosPosibles) {
          int columnaMovimiento = movimiento[1];
@@ -166,6 +189,9 @@ public class Tablero {
 
       if (filaInicial - filaFinal > 1 || filaFinal - filaInicial > 1) {
          comerPieza(posicionInicial, posicionFinal);
+         turnosSinComer = 0;
+      } else {
+         turnosSinComer++;
       }
 
    }
@@ -210,8 +236,6 @@ public class Tablero {
       // eliminar del tablero y de las posiciones la victima
 
       tablero[filaVictima][columnaVictima] = 'L';
-      System.out.println(filaVictima);
-      System.out.println(columnaVictima);
 
       // TODO mejorar coordenadas
 
@@ -225,33 +249,39 @@ public class Tablero {
             posNegras[i] = new int[] {9, 9};
          }
       }
-
-      System.out.println(Arrays.deepToString(posNegras));
-
    }
 
-   public void comprobarSiNoHayMovimientos() {
-      // comprobar si las blancas pueden mover
-      int posicionesBlancasDisponibles = 0;
-
-      for (int[] posicion : posBlancas) {
-          posicionesBlancasDisponibles = devolverMovimientos(posicion).length;
+   public void evaluarPiezasRestantes(){
+      int piezasBlancas = 12;
+      int piezasNegras = 12;
+      for (int[] posicion : posBlancas){
+         if (Arrays.equals(posicion, new int[] {9, 9})){
+            piezasBlancas--;
+         }
       }
-
-      if (posicionesBlancasDisponibles == 0) {
+      if (piezasBlancas == 0){
+         System.out.println("NEGRAS GANAN");
          setGameOver();
       }
-
-      // comprobar si las negras pueden mover
-      int posicionesNegrasDisponibles = 0;
-
-      for (int[] posiciones : posNegras) {
-         posicionesNegrasDisponibles = devolverMovimientos(posiciones).length;
+      for (int[] posicion : posNegras){
+         if (Arrays.equals(posicion, new int[] {9, 9})){
+            piezasNegras--;
+         }
       }
-
-      if (posicionesNegrasDisponibles == 0) {
+      if (piezasNegras == 0){
+         System.out.println("BLANCAS GANAN");
          setGameOver();
       }
+   }
+
+   public boolean hayMovimientos(int[][] Posiciones) {
+      for (int[] posicion : Posiciones) {
+         if (!Arrays.equals(posicion, new int[] {9, 9})){
+           return true;
+         }
+      }
+
+      return false;
    }
 
    public char[][] getTablero() {
@@ -291,7 +321,7 @@ public class Tablero {
    }
 
    public void setGameOver() {
-      this.gameOver = !this.gameOver;
+      this.gameOver = true;
    }
 
    public char getLetraJugador() {

@@ -8,13 +8,14 @@ public class Main {
         Tablero tablero = new Tablero();
 
         //Posicion Inicial
-        tablero.printTablero();
+        tablero.pintarTablero();
 
         while (!tablero.isGameOver()){
             turnoJugador(tablero);
             //evaluarPartida();
+            tablero.comprobarSiNoHayMovimientos();
             tablero.increaseTurno();
-            tablero.printTablero();
+            tablero.pintarTablero();
         }
 
     }
@@ -43,10 +44,6 @@ public class Main {
         } while (tablero.getTablero()[posInicial[0]][posInicial[1]] != tablero.getLetraJugador());
 
         int[][] posValidas = tablero.devolverMovimientos(posInicial);
-        if (posValidas.length == 0){
-            tablero.setGameOver();
-            return;
-        }
 
         System.out.println("POSICIONES VALIDAS: ");
         System.out.println(Arrays.deepToString(posValidas));

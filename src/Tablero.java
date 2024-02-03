@@ -1,5 +1,9 @@
+import com.diogonunes.jcolor.Attribute;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static com.diogonunes.jcolor.Ansi.colorize;
 
 public class Tablero {
    private final int DIMENSION= 8;
@@ -17,6 +21,8 @@ public class Tablero {
    };
 
    public int turno = 0;
+
+   public int turnosSinComer = 0;
    public char letraJugador;
 
    private boolean gameOver = false;
@@ -48,66 +54,89 @@ public class Tablero {
       }
    }
 
-   void printTablero(){
-       for (char[] fila : this.tablero){
-           System.out.println(Arrays.toString(fila));
-       }
-       System.out.println();
+   void pintarTablero() {
+
+      System.out.print("     ");
+
+      for (int i = 0; i < DIMENSION; i++){
+         System.out.print(colorize(Integer.toString(i), Attribute.BRIGHT_YELLOW_TEXT()));
+         System.out.print("    ");
+      }
+
+      System.out.println();
+      System.out.println();
+
+      for (int i = 0; i<DIMENSION; i++) {
+         System.out.print(colorize(Integer.toString(i), Attribute.BRIGHT_YELLOW_TEXT()));
+         System.out.print("    ");
+         for (int j=0; j< DIMENSION; j++) {
+            if (tablero[i][j] == 'B'){
+               System.out.print(colorize("B", Attribute.BRIGHT_CYAN_TEXT()));
+            } else if (tablero[i][j] == 'N'){
+               System.out.print(colorize("N", Attribute.BRIGHT_MAGENTA_TEXT()));
+            } else {
+               System.out.print(tablero[i][j]);
+            }
+            System.out.print("    ");
+         }
+         System.out.println("");
+         System.out.println("");
+      }
    }
 
+   //Suerte entendiendo esto, pero funciona
    int[][] devolverMovimientos(int[] posicionInicial){
       ArrayList<int[]> result = new ArrayList<>();
 
       //comprobar si posicion inicial es de Blancas
       if (tablero[posicionInicial[0]][posicionInicial[1]] == 'B'){
-         int i = posicionInicial[0] - 1;
-         int j = posicionInicial[1] - 1;
-
-         if (i >= 0 && j >= 0){
-
-            if (tablero[i][j] == 'L'){
-               int[] posicionValida = {i, j};
-               result.add(posicionValida);
+         if (posicionInicial[0] - 1 >= 0 && posicionInicial[1] - 1 >= 0){
+            int[] posIzq = new int[]{posicionInicial[0] - 1, posicionInicial[1] - 1};
+            if (tablero[posIzq[0]][posIzq[1]] == 'L'){
+               result.add(posIzq);
             }
-
+            if (posicionInicial[0] - 2 >= 0 && posicionInicial[1] - 2 >= 0 && tablero[posicionInicial[0] - 1][posicionInicial[1] - 1] == 'N' && tablero[posicionInicial[0] - 2][posicionInicial[1] - 2] == 'L'){
+               int[] comerDiagonalIzq = {posicionInicial[0] - 2, posicionInicial[1] - 2};
+               result.add(comerDiagonalIzq);
+            }
          }
 
-         if (tablero[i][posicionInicial[1] + 1] == 'L'){
-            int[] posicionValida = {i, posicionInicial[1] + 1};
-            result.add(posicionValida);
+         if (posicionInicial[0] - 1 >= 0 && posicionInicial[1] + 1 < DIMENSION){
+            int[] posDcha = new int[]{posicionInicial[0] - 1, posicionInicial[1] + 1};
+            if (tablero[posDcha[0]][posDcha[1]] == 'L'){
+               result.add(posDcha);
+            }
+            if (posicionInicial[0] - 2 >= 0 && posicionInicial[1] + 2 < DIMENSION && (tablero[posicionInicial[0] - 1][posicionInicial[1] + 1] == 'N' && tablero[posicionInicial[0] - 2][posicionInicial[1] + 2] == 'L')){
+               int[] comerDiagonalDcha = {posicionInicial[0] - 2, posicionInicial[1] + 2};
+               result.add(comerDiagonalDcha);
+            }
          }
-
       }
 
-      //comprobar si posicion inicial es de Negras
       if (tablero[posicionInicial[0]][posicionInicial[1]] == 'N'){
-         int i = posicionInicial[0] + 1;
-         int j = posicionInicial[1] - 1;
-
-         //evitamos borde tablero
-         if (i < DIMENSION && j >= 0){
-
-            if (tablero[i][j] == 'L'){
-               int[] posicionValida = {i, j};
-               result.add(posicionValida);
+         if (posicionInicial[0] + 1 < DIMENSION && posicionInicial[1] - 1 >= 0){
+            int[] posIzq = new int[]{posicionInicial[0] + 1, posicionInicial[1] - 1};
+            if (tablero[posIzq[0]][posIzq[1]] == 'L'){
+               result.add(posIzq);
             }
-
-            if (tablero[posicionInicial[0] + 1][posicionInicial[1] - 1] == 'B' && tablero[posicionInicial[0] + 2][posicionInicial[1] - 2] == 'L'){
-               // si se llega aqui hay que eliminar la pieza Blanca y registrar el movimiento de la pieza Negra
-               // AQUI FALTA PASAR LOS PARAMETROS CORRECTOS AL METODO Y COMPROBAR QUE FUNCIONE
-               //comerPieza();
+            if (posicionInicial[0] + 2 < DIMENSION && posicionInicial[1] - 2 >= 0 && tablero[posicionInicial[0] + 1][posicionInicial[1] - 1] == 'B' && tablero[posicionInicial[0] + 2][posicionInicial[1] - 2] == 'L'){
+               int[] comerDiagonalIzq = {posicionInicial[0] + 2, posicionInicial[1] - 2};
+               result.add(comerDiagonalIzq);
             }
          }
 
-         if (j + 2 < DIMENSION){
-
-            if (tablero[i][posicionInicial[1] + 1] == 'L'){
-               int[] posicionValida = {i, posicionInicial[1] + 1};
-               result.add(posicionValida);
+         if (posicionInicial[0] + 1 < DIMENSION && posicionInicial[1] + 1 < DIMENSION){
+            int[] posDcha = new int[]{posicionInicial[0] + 1, posicionInicial[1] + 1};
+            if (tablero[posDcha[0]][posDcha[1]] == 'L'){
+               result.add(posDcha);
             }
-
+            if (posicionInicial[0] + 2 < DIMENSION && posicionInicial[1] + 2 < DIMENSION && (tablero[posicionInicial[0] + 1][posicionInicial[1] + 1] == 'B' && tablero[posicionInicial[0] + 2][posicionInicial[1] + 2] == 'L')){
+               int[] comerDiagonalDcha = {posicionInicial[0] + 2, posicionInicial[1] + 2};
+               result.add(comerDiagonalDcha);
+            }
          }
       }
+
 
       //pasar el ArrayList a int[][] y asi devolver las posiciones validas
       int[][] resultArray = new int[result.size()][2];
@@ -120,6 +149,7 @@ public class Tablero {
 
 
    public void hacerMovimiento(int[] posicionInicial, int[] posicionFinal, int[][] movimientosPosibles) {
+
       boolean estaDentro = false;
       for (int[] movimiento : movimientosPosibles) {
          int columnaMovimiento = movimiento[1];
@@ -157,10 +187,16 @@ public class Tablero {
          }
       }
 
+      if (filaInicial - filaFinal > 1 || filaFinal - filaInicial > 1) {
+         comerPieza(posicionInicial, posicionFinal);
+         turnosSinComer = 0;
+      } else {
+         turnosSinComer++;
+      }
 
    }
 
-   public void comerPieza(int[] posicionInicial, int[] posicionFinal, int[][] movimientosPosibles){
+   public void comerPieza(int[] posicionInicial, int[] posicionFinal){
       // COMER PIEZA
 
       // si hay una diferencia de dos filas y dos columnas, entonces ha pasado por encima
@@ -172,50 +208,82 @@ public class Tablero {
       int filaFinal = posicionFinal[0];
       int columnaFinal = posicionFinal[1];
 
-      if (columnaFinal - columnaInicial > 1) {
+      int filaVictima = 0;
+      int columnaVictima = 0;
 
-         int filaVictima = 0;
-         int columnaVictima = 0;
+      // ver si son negras (i.e., si la fila aumenta al moverse)
+      if (filaInicial < filaFinal) {
+         // si ha ido hacia la dcha, la columna aumenta
+         filaVictima = filaInicial + 1;
+      }
+      // si es blanca, la columna disminuye una
+      else if (filaInicial > filaFinal) {
+         filaVictima = filaInicial - 1;
+      }
 
-         // ver si son negras (i.e., si la fila aumenta al moverse)
-         if (filaInicial < filaFinal) {
-            // si ha ido hacia la dcha, la columna aumenta
-            filaVictima = filaInicial + 1;
+      // si va a la derecha, la columna aumenta
+      if (columnaInicial < columnaFinal) {
+         columnaVictima = columnaInicial +1;
+      }
+
+      // si ha ido hacia la izq, la columna disminuye
+      else if (columnaInicial > columnaFinal) {
+         columnaVictima = columnaInicial -1;
+      }
+
+      // int[] posicionVictima = {filaVictima, columnaVictima};
+
+      // eliminar del tablero y de las posiciones la victima
+
+      tablero[filaVictima][columnaVictima] = 'L';
+
+      // TODO mejorar coordenadas
+
+      for(int i = 0; i < posBlancas.length; i++){
+         if (posBlancas[i][0] == filaVictima && posBlancas[i][1] == columnaVictima){
+            posBlancas[i] = new int[] {9, 9};
          }
-         // si es blanca, la columna disminuye una
-         else if (filaInicial > filaFinal) {
-            filaVictima = filaInicial - 1;
-         }
-
-         // si va a la derecha, la columna aumenta
-         if (columnaInicial < columnaFinal) {
-            columnaVictima = columnaFinal +1;
-         }
-
-         // si ha ido hacia la izq, la columna disminuye
-         else if (columnaInicial > columnaFinal) {
-            columnaVictima = columnaInicial -1;
-         }
-
-         int[] posicionVictima = new int[] {filaVictima, columnaVictima};
-
-         // eliminar del tablero y de las posiciones la victima
-
-         tablero[filaVictima][columnaVictima] = 'L';
-
-         for(int i = 0; i < posBlancas.length; i++){
-            if (Arrays.equals(posBlancas[i], posicionVictima)){
-               posBlancas[i] = new int[] {9, 9};
-            }
-         }
-
-         for(int i = 0; i < posNegras.length; i++){
-            if (Arrays.equals(posNegras[i], posicionVictima)){
-               posNegras[i] = new int[] {9, 9};
-            }
+      }
+      for(int i = 0; i < posNegras.length; i++){
+         if (posNegras[i][0] == filaVictima && posNegras[i][1] == columnaVictima){
+            posNegras[i] = new int[] {9, 9};
          }
       }
    }
+
+   public void evaluarPiezasRestantes(){
+      int piezasBlancas = 12;
+      int piezasNegras = 12;
+      for (int[] posicion : posBlancas){
+         if (Arrays.equals(posicion, new int[] {9, 9})){
+            piezasBlancas--;
+         }
+      }
+      if (piezasBlancas == 0){
+         System.out.println("NEGRAS GANAN");
+         setGameOver();
+      }
+      for (int[] posicion : posNegras){
+         if (Arrays.equals(posicion, new int[] {9, 9})){
+            piezasNegras--;
+         }
+      }
+      if (piezasNegras == 0){
+         System.out.println("BLANCAS GANAN");
+         setGameOver();
+      }
+   }
+
+   public boolean hayMovimientos(int[][] Posiciones) {
+      for (int[] posicion : Posiciones) {
+         if (!Arrays.equals(posicion, new int[] {9, 9})){
+           return true;
+         }
+      }
+
+      return false;
+   }
+
    public char[][] getTablero() {
       return tablero;
    }
@@ -253,7 +321,7 @@ public class Tablero {
    }
 
    public void setGameOver() {
-      this.gameOver = !this.gameOver;
+      this.gameOver = true;
    }
 
    public char getLetraJugador() {
